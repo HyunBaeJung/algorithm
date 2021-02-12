@@ -1,0 +1,115 @@
+"""
+단어 변환
+
+문제 설명
+두 개의 단어 begin, target과 단어의 집합 words가 있습니다. 아래와 같은 규칙을 이용하여 begin에서 target으로 변환하는 가장 짧은 변환 과정을 찾으려고 합니다.
+
+1. 한 번에 한 개의 알파벳만 바꿀 수 있습니다.
+2. words에 있는 단어로만 변환할 수 있습니다.
+예를 들어 begin이 hit, target가 cog, words가 [hot,dot,dog,lot,log,cog]라면 hit -> hot -> dot -> dog -> cog와 같이 4단계를 거쳐 변환할 수 있습니다.
+
+두 개의 단어 begin, target과 단어의 집합 words가 매개변수로 주어질 때, 최소 몇 단계의 과정을 거쳐 begin을 target으로 변환할 수 있는지 return 하도록 solution 함수를 작성해주세요.
+
+제한사항
+각 단어는 알파벳 소문자로만 이루어져 있습니다.
+각 단어의 길이는 3 이상 10 이하이며 모든 단어의 길이는 같습니다.
+words에는 3개 이상 50개 이하의 단어가 있으며 중복되는 단어는 없습니다.
+begin과 target은 같지 않습니다.
+변환할 수 없는 경우에는 0를 return 합니다.
+입출력 예
+begin	target	words	return
+hit	cog	[hot, dot, dog, lot, log, cog]	4
+hit	cog	[hot, dot, dog, lot, log]	0
+입출력 예 설명
+예제 #1
+문제에 나온 예와 같습니다.
+
+예제 #2
+target인 cog는 words 안에 없기 때문에 변환할 수 없습니다.
+
+
+**TEST CASE 2개 실패
+
+
+"""
+
+
+
+from collections import deque
+
+def solution(begin, target, words):
+    
+    #결과값 리스트
+    global resultList
+    resultList = []
+    
+    #편의상 시작값은 deque의 0인덱스로 삽입.
+    words = deque(words)
+    words.appendleft(begin)
+    
+    #값이 존재하지 않을 경우 exit
+    try:
+        words.index(target)
+    except:
+        return 0
+    
+    #리스트의 길이와 단어의 길이 측정
+    listLen = len(words)
+    wordLen = len(words[0])
+    
+    #방문가능 2차원배열 생성
+    graph = []
+    for a in range(listLen):
+        graph.append([0]*listLen)
+        
+    #방문여부 2차원배열 생성
+    visitied = []
+    for a in range(listLen):
+        visitied.append([0]*listLen)
+    
+    #방문가능 2차원배열 값 입력
+    for fseq in range(listLen):
+        for sseq in range(listLen):
+            #한글자만 다르면 1이 되도록
+            is_linked = 0
+            
+            for a in range(wordLen):
+                if(words[fseq][a] == words[sseq][a]):
+                    is_linked = is_linked+1
+            
+            if(is_linked==2):
+                graph[fseq][sseq] = 1
+    
+    beginIndex = words.index(begin)
+    targetIndex = words.index(target)
+    
+    shortestPath(beginIndex,targetIndex,graph,visitied,0)
+    
+    if(len(resultList)==0):
+        resultList.append(0)
+    
+    answer = min(resultList)
+    return answer
+    
+def shortestPath(beginIndex,targetIndex,graph,visitied,tryNum):
+    
+    for a in range(len(graph)):
+             
+        #방문가능하며 방문한적이 없을 때 방문
+        if(graph[beginIndex][a] == 1 and visitied[beginIndex][a] == 0):
+            
+            #타겟인덱스에 닿았을 때 종료
+            if(a == targetIndex):
+                resultList.append(tryNum+1)
+                break
+            
+            visitied[beginIndex][a] = 1
+            visitied[a][beginIndex] = 1
+            
+            shortestPath(a,targetIndex,graph,visitied,tryNum+1)
+        
+        
+            
+            
+    
+    
